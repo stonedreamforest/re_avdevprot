@@ -1,0 +1,89 @@
+;
+; re_avdevprot.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=re_avdevprot.cat
+DriverVer = 11/27/2017,22.19.24.526
+
+[DestinationDirs]
+DefaultDestDir = 12
+re_avdevprot_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+re_avdevprot.sys  = 1,,
+;
+
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%re_avdevprot.DeviceDesc%=re_avdevprot_Device, Root\re_avdevprot ; TODO: edit hw-id
+
+[re_avdevprot_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+re_avdevprot.sys
+
+;-------------- Service installation
+[re_avdevprot_Device.NT.Services]
+AddService = re_avdevprot,%SPSVCINST_ASSOCSERVICE%, re_avdevprot_Service_Inst
+
+; -------------- re_avdevprot driver install sections
+[re_avdevprot_Service_Inst]
+DisplayName    = %re_avdevprot.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\re_avdevprot.sys
+
+;
+;--- re_avdevprot_Device Coinstaller installation ------
+;
+
+[re_avdevprot_Device.NT.CoInstallers]
+AddReg=re_avdevprot_Device_CoInstaller_AddReg
+CopyFiles=re_avdevprot_Device_CoInstaller_CopyFiles
+
+[re_avdevprot_Device_CoInstaller_AddReg]
+;
+
+
+[re_avdevprot_Device_CoInstaller_CopyFiles]
+;
+
+
+[re_avdevprot_Device.NT.Wdf]
+KmdfService =  re_avdevprot, re_avdevprot_wdfsect
+[re_avdevprot_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "re_avdevprot Installation Disk"
+re_avdevprot.DeviceDesc = "re_avdevprot Device"
+re_avdevprot.SVCDESC = "re_avdevprot Service"
