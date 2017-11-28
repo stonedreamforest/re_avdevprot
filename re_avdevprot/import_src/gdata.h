@@ -9,9 +9,25 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 extern UNICODE_STRING DefaultSDDLString;
 
 extern AVK_MUTANT g_Avk_Mutant;
+extern SYSINFO g_SysInfo;
 extern AVK_INIT g_AvkInit;
 
 

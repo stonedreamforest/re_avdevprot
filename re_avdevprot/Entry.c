@@ -53,7 +53,7 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT  DriverObject , _In_ PUNICODE_STRING Re
 	}
 	g_AvkInit.field_12 = 1;
 	avk_GetSimulateUSBValue(&g_AvkInit.RegistryPath);
-	nStatus = sub_1400019EC(g_Avk_Mutant.buf_44);
+	nStatus = avk_GetSystemInfo(&g_SysInfo);
 	if (nStatus) {
 		goto LEAVE;
 	}

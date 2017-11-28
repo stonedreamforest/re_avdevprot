@@ -36,9 +36,6 @@
     <ClCompile Include="import_src\gdata.c">
       <Filter>import_src</Filter>
     </ClCompile>
-    <ClCompile Include="import_src\gtype.c">
-      <Filter>import_src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="import_src\avdevprot.h">

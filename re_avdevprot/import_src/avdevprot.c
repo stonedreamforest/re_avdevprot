@@ -17,7 +17,7 @@ NTSTATUS avk_CopyRegistryPath(PUNICODE_STRING src , PUNICODE_STRING dst) {
 		return 0x0C0000017;
 	}
 	RtlCopyUnicodeString(dst , src);
-	return 0; 
+	return 0;
 }
 
 
@@ -52,9 +52,88 @@ NTSTATUS avk_GetSimulateUSBValue(PUNICODE_STRING RegistryPath) {
 	return 0;
 }
 
-NTSTATUS sub_1400019EC(void *a1) {
-	UNREFERENCED_PARAMETER(a1);
-	return 0;
+NTSTATUS avk_GetSystemInfo(SYSINFO *SysInfo) {
+	PEPROCESS peprocess;
+	OSVERSIONINFOEXW os ={ 0 };
+
+	memset(&SysInfo->field_14 , 0xff , 0x28);
+	SysInfo->NumberProcessors = KeNumberProcessors;
+	os.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);	//	0x11c
+	if (RtlGetVersion((POSVERSIONINFOW)&os) >= 0) {
+		SysInfo->dwBuildNumber = os.dwBuildNumber;
+		SysInfo->dwMajorVersion = os.dwMajorVersion;
+		SysInfo->dwMinorVersion = os.dwMinorVersion;
+		SysInfo->wServicePackMajor = os.wServicePackMajor;
+	}
+	int flag = sub_140003694(SysInfo->dwBuildNumber , SysInfo->dwMinorVersion);
+	peprocess = IoGetCurrentProcess();
+	SysInfo->field_14 = sub_1400036E4(peprocess);
+	if (SysInfo->dwMajorVersion == 5) {
+		if (SysInfo->dwMinorVersion == 1 || SysInfo->dwMinorVersion == 2) {
+			SysInfo->field_18 = 0x158;
+			SysInfo->field_1C = 0x2B0;
+			SysInfo->field_20 = 0x318;
+			SysInfo->field_24 = 0x308;
+			SysInfo->field_28 = 0x218;
+			SysInfo->field_2C = 0x10;
+			SysInfo->field_34 = 0x3C8;
+		}
+	}
+	else if (SysInfo->dwMajorVersion == 6) {
+		if (SysInfo->dwMinorVersion) {
+			switch (SysInfo->dwMinorVersion) {
+				case  1:
+					SysInfo->field_18 = 0x200;
+					SysInfo->field_1C = 0x328;
+					SysInfo->field_20 = 0x390;
+					SysInfo->field_24 = 0x168;
+					SysInfo->field_28 = 0x290;
+					SysInfo->field_2C = 0x180;
+					SysInfo->field_34 = flag == 0x440 ? 0x410 : flag;
+					break;
+				case 2:
+					SysInfo->field_18 = 0x408;
+					SysInfo->field_1C = 0x480;
+					SysInfo->field_20 = 0x450;
+					SysInfo->field_24 = 0x2D0;
+					SysInfo->field_28 = 0x3D0;
+					SysInfo->field_2C = 0x2E0;
+					SysInfo->field_34 = 0x3F0;
+					break;
+				case 3:
+					SysInfo->field_18 = 0x408;
+					SysInfo->field_1C = 0x480;
+					SysInfo->field_20 = 0x450;
+					SysInfo->field_24 = 0x2D0;
+					SysInfo->field_28 = 0x3D0;
+					SysInfo->field_2C = 0x2E0;
+					SysInfo->field_34 = 0x678;
+					break;
+			}
+		}
+		else {
+			SysInfo->field_18 = 352;
+			SysInfo->field_1C = 640;
+			SysInfo->field_20 = 744;
+			SysInfo->field_24 = 200;
+			SysInfo->field_28 = 496;
+			SysInfo->field_2C = 224;
+			SysInfo->field_34 = 992;
+		}
+	}
+	if (SysInfo->field_20 != 0xFFFFFFFF) {
+		SysInfo->field_1C = SysInfo->field_20 + 8;
+	}
+	if (SysInfo->dwMajorVersion < 5) {
+		return 0x0C0000002;
+	}
+	else if (SysInfo->dwMajorVersion != 5) {
+		return 0;
+	}
+	else if (SysInfo->dwMinorVersion) {
+		return 0;
+	}
+	return 0x0C0000002;
 }
 
 void sub_14000172C() {
@@ -90,4 +169,14 @@ NTSTATUS avk_DispatchDeviceControl(_Inout_ struct _DEVICE_OBJECT *DeviceObject ,
 	return 0;
 }
 
+int sub_140003694(int a1 , int a2) {
+	UNREFERENCED_PARAMETER(a1);
+	UNREFERENCED_PARAMETER(a2);
+	return 0;
+}
+
+NTSTATUS sub_1400036E4(void *a1) {
+	UNREFERENCED_PARAMETER(a1);
+	return 0;
+}
 

@@ -37,7 +37,12 @@ NTSTATUS avk_CopyRegistryPath(PUNICODE_STRING src , PUNICODE_STRING dst);
 //************************************************************************************************************
 NTSTATUS avk_GetSimulateUSBValue(PUNICODE_STRING RegistryPath);
 
-NTSTATUS sub_1400019EC(void *a1);
+//************************************************************************************************************
+//	创建作者  :	Tennn
+//  修改时间  :  2017/11/28 22:27
+//	函数功能  :	获取系统信息 sub_1400019EC
+//************************************************************************************************************
+NTSTATUS avk_GetSystemInfo(SYSINFO *SysInfo);
 void sub_14000172C();
 
 
@@ -71,9 +76,9 @@ NTSTATUS avk_DispatchDeviceControl(_Inout_ struct _DEVICE_OBJECT *DeviceObject ,
 
 
 
+int sub_140003694(int a1 , int a2);
 
-
-
+NTSTATUS sub_1400036E4(void *a1);
 
 
 

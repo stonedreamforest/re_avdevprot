@@ -16,8 +16,26 @@ typedef struct _AVK_MUTANT {
 	int field_4;
 	KMUTANT Mutant;
 	int field_40;
-	char buf_44[60];
-}AVK_MUTANT,*PAVK_MUTANT;
+}AVK_MUTANT,*PAVK_MUTANT;	//	0x44
+
+
+typedef struct _SYSINFO {
+	int dwBuildNumber;
+	int dwMajorVersion;
+	int dwMinorVersion;
+	int wServicePackMajor;
+	int NumberProcessors;
+	int field_14;
+	int field_18;
+	int field_1C;
+	int field_20;
+	int field_24;
+	int field_28;
+	int field_2C;
+	int field_30;
+	int field_34;
+	int field_38;
+}SYSINFO,*PSYSINFO;
 
 
 typedef struct _AVK_INIT {
@@ -44,7 +62,7 @@ typedef struct _AVK_INIT {
 	int field_90;
 	int field_94;
 	__int64 field_98;
-}AVK_INIT , *PAVK_INIT;
+}AVK_INIT , *PAVK_INIT;		//	0xa0
 
 
 
