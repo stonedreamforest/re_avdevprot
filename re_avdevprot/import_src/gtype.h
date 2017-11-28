@@ -11,7 +11,13 @@
 
 
 
-
+typedef struct _AVK_MUTANT {
+	int field_0;
+	int field_4;
+	KMUTANT Mutant;
+	int field_40;
+	char buf_44[60];
+}AVK_MUTANT,*PAVK_MUTANT;
 
 
 typedef struct _AVK_INIT {

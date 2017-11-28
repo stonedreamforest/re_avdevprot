@@ -11,15 +11,44 @@
 
 
 
-NTSTATUS sub_140009388(PUNICODE_STRING src , PUNICODE_STRING dst) {
-	UNREFERENCED_PARAMETER(src);
-	UNREFERENCED_PARAMETER(dst);
-	return 0;
+NTSTATUS avk_CopyRegistryPath(PUNICODE_STRING src , PUNICODE_STRING dst) {
+	dst->Buffer = ExAllocatePoolWithTag(PagedPool , src->MaximumLength , 0x44504664);
+	if (!dst->Buffer) {
+		return 0x0C0000017;
+	}
+	RtlCopyUnicodeString(dst , src);
+	return 0; 
 }
 
 
-NTSTATUS sub_1400093E8(PUNICODE_STRING RegistryPath) {
-	UNREFERENCED_PARAMETER(RegistryPath);
+NTSTATUS avk_GetSimulateUSBValue(PUNICODE_STRING RegistryPath) {
+	typedef struct _KEYVALUEINFORMATION {
+		__int64 field_0;
+		int field_8;
+		int field_C;
+		int field_10;
+	}KEYVALUEINFORMATION;
+	HANDLE KeyHandle = 0;
+	ULONG ResultLength = 0;
+	UNICODE_STRING ValueName ={ 0 };
+	OBJECT_ATTRIBUTES ObjectAttributes ={ 0 };
+	KEYVALUEINFORMATION KeyValueInformation ={ 0 };
+
+	InitializeObjectAttributes(&ObjectAttributes , RegistryPath , OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE , 0 , 0);
+	g_Avk_Mutant.field_40 = 0;
+	if (ZwOpenKey(&KeyHandle , 0x20019 , &ObjectAttributes) >= 0) {
+		return 0;
+	}
+	RtlInitUnicodeString(&ValueName , L"SimulateUSBDevice");
+	if (ZwQueryValueKey(KeyHandle ,
+						&ValueName ,
+						KeyValuePartialInformation ,
+						&KeyValueInformation ,
+						sizeof(KEYVALUEINFORMATION) ,
+						&ResultLength) < 0) {
+		g_Avk_Mutant.field_40 = KeyValueInformation.field_C;
+	}
+	ZwClose(KeyHandle);
 	return 0;
 }
 

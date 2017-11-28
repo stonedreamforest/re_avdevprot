@@ -11,8 +11,7 @@
 
 extern UNICODE_STRING DefaultSDDLString;
 
-
-extern char byte_140006354[60];
+extern AVK_MUTANT g_Avk_Mutant;
 extern AVK_INIT g_AvkInit;
 
 

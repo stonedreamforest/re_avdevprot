@@ -46,14 +46,14 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT  DriverObject , _In_ PUNICODE_STRING Re
 	g_AvkInit.ListHead_40.Next = 0;
 	KeInitializeSpinLock(&g_AvkInit.SpinLock);
 	if (RegistryPath && RegistryPath->Length && RegistryPath->MaximumLength && RegistryPath->Buffer) {
-		nStatus = sub_140009388(RegistryPath , &g_AvkInit.RegistryPath);
+		nStatus = avk_CopyRegistryPath(RegistryPath , &g_AvkInit.RegistryPath);
 		if (nStatus) {
 			goto LEAVE;
 		}
 	}
 	g_AvkInit.field_12 = 1;
-	sub_1400093E8(&g_AvkInit.RegistryPath);
-	nStatus = sub_1400019EC(byte_140006354);
+	avk_GetSimulateUSBValue(&g_AvkInit.RegistryPath);
+	nStatus = sub_1400019EC(g_Avk_Mutant.buf_44);
 	if (nStatus) {
 		goto LEAVE;
 	}
