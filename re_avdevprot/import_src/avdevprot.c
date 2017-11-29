@@ -67,7 +67,7 @@ NTSTATUS avk_GetSystemInfo(SYSINFO *SysInfo) {
 	}
 	int flag = avk_GetOffsetFlag(SysInfo->dwBuildNumber , SysInfo->dwMinorVersion);
 	peprocess = IoGetCurrentProcess();
-	SysInfo->field_14 = avk_GetPeprocessValue((char *)peprocess);
+	SysInfo->field_14 = avk_GetPeprocessValue((char *)peprocess , 0x1000 , "System" , 6);
 	if (SysInfo->dwMajorVersion == 5) {
 		if (SysInfo->dwMinorVersion == 1 || SysInfo->dwMinorVersion == 2) {
 			SysInfo->field_18 = 0x158;
@@ -184,17 +184,15 @@ int avk_GetOffsetFlag(int dwBuildNumber , int dwMinorVersion) {
 	return *(int *)(OffsetFlag + 2);
 }
 
-int avk_GetPeprocessValue(char *peprocess) {
-	return avk_GetValue((char *)peprocess , 0x1000 , "System" , 6);
-}
 
-int avk_GetValue(char *peprocess , int length , char *aSystem , int a4) {
+
+int avk_GetPeprocessValue(char *peprocess , int length , char *aSystem , int LimitValue) {
 	for (int i = 0 , j = 0; i < length; i++) {
 		for (j = 0; j < length; j++) {
-			if (j > a4) {
+			if (j > LimitValue) {
 				break;
 			}
-			else if (j == a4) {
+			else if (j == LimitValue) {
 				return i;	
 			}
 			int x_flag = aSystem[j];
@@ -209,7 +207,7 @@ int avk_GetValue(char *peprocess , int length , char *aSystem , int a4) {
 				break;
 			}
 		}
-		if (j == a4) {
+		if (j == LimitValue) {
 			return i;
 		}
 	}
