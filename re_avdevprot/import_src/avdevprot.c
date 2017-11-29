@@ -65,9 +65,9 @@ NTSTATUS avk_GetSystemInfo(SYSINFO *SysInfo) {
 		SysInfo->dwMinorVersion = os.dwMinorVersion;
 		SysInfo->wServicePackMajor = os.wServicePackMajor;
 	}
-	int flag = sub_140003694(SysInfo->dwBuildNumber , SysInfo->dwMinorVersion);
+	int flag = avk_GetOffsetFlag(SysInfo->dwBuildNumber , SysInfo->dwMinorVersion);
 	peprocess = IoGetCurrentProcess();
-	SysInfo->field_14 = sub_1400036E4(peprocess);
+	SysInfo->field_14 = avk_GetPeprocessValue((char *)peprocess);
 	if (SysInfo->dwMajorVersion == 5) {
 		if (SysInfo->dwMinorVersion == 1 || SysInfo->dwMinorVersion == 2) {
 			SysInfo->field_18 = 0x158;
@@ -169,14 +169,50 @@ NTSTATUS avk_DispatchDeviceControl(_Inout_ struct _DEVICE_OBJECT *DeviceObject ,
 	return 0;
 }
 
-int sub_140003694(int a1 , int a2) {
-	UNREFERENCED_PARAMETER(a1);
-	UNREFERENCED_PARAMETER(a2);
-	return 0;
+int avk_GetOffsetFlag(int dwBuildNumber , int dwMinorVersion) {
+	if (dwBuildNumber != 6 || dwMinorVersion != 1) {
+		return 0x0FFFFFFFF;
+	}
+	UNICODE_STRING US_PsIsThreadTerminating ={ 42u, 44u, L"PsIsThreadTerminating" };
+	char *OffsetFlag =  MmGetSystemRoutineAddress(&US_PsIsThreadTerminating);
+	if (!OffsetFlag || ((short *)OffsetFlag)[0] != 0x818b) {
+		return 0x0FFFFFFFF;
+	}
+	if (OffsetFlag[6] != 0x24 || OffsetFlag[7] != 1 || OffsetFlag[8] != 0xc3) {
+		return 0x0FFFFFFFF;
+	}
+	return *(int *)(OffsetFlag + 2);
 }
 
-NTSTATUS sub_1400036E4(void *a1) {
-	UNREFERENCED_PARAMETER(a1);
+int avk_GetPeprocessValue(char *peprocess) {
+	return avk_GetValue((char *)peprocess , 0x1000 , "System" , 6);
+}
+
+int avk_GetValue(char *peprocess , int length , char *aSystem , int a4) {
+	for (int i = 0 , j = 0; i < length; i++) {
+		for (j = 0; j < length; j++) {
+			if (j > a4) {
+				break;
+			}
+			else if (j == a4) {
+				return i;	
+			}
+			int x_flag = aSystem[j];
+			int v_flag = peprocess[i + j];
+			if ((v_flag - 0x41) <= 0x19) {
+				v_flag |= 0x20;
+			}
+			if ((x_flag - 0x41) <= 0x19) {
+				x_flag |= 0x20;
+			}
+			if (x_flag == v_flag) {
+				break;
+			}
+		}
+		if (j == a4) {
+			return i;
+		}
+	}
 	return 0;
 }
 
