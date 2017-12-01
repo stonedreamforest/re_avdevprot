@@ -38,6 +38,18 @@ typedef struct _SYSINFO {
 }SYSINFO,*PSYSINFO;
 
 
+
+
+
+typedef struct _AM_OFF28 {
+	__int64 field_0;
+	int field_8;
+	char field_C[116];
+	__int16 Type;
+	unsigned __int16 Size;
+}AM_OFF28 , *PAM_OFF28;
+
+
 typedef struct _AVK_INIT {
 	__int64 field_0;
 	PDEVICE_OBJECT DeviceObject;		//	0x08
@@ -47,7 +59,7 @@ typedef struct _AVK_INIT {
 	char field_13;
 	int field_14;
 	UNICODE_STRING RegistryPath;		//	0x18
-	__int64 field_28;
+	PAM_OFF28 am_off28;
 	__int64 field_30;
 	__int64 field_38;
 	SINGLE_LIST_ENTRY ListHead_40;
@@ -63,7 +75,6 @@ typedef struct _AVK_INIT {
 	int field_94;
 	__int64 field_98;
 }AVK_INIT , *PAVK_INIT;		//	0xa0
-
 
 
 

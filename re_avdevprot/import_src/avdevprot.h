@@ -94,6 +94,39 @@ int avk_GetPeprocessValue(char *peprocess , int length , char *aSystem , int a4)
 
 
 
+PAM_OFF28 sub_1400019E4();
+
+
+NTSTATUS sub_140003290(void *a1);
+
+void sub_1400032EC();
+
+
+NTSTATUS sub_140003150();
+
+void sub_140002A40(void *a1,void *a2);
+
+void sub_1400032F8();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

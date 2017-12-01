@@ -12,6 +12,7 @@
 
 
 NTSTATUS avk_CopyRegistryPath(PUNICODE_STRING src , PUNICODE_STRING dst) {
+	PAGED_CODE();
 	dst->Buffer = ExAllocatePoolWithTag(PagedPool , src->MaximumLength , 0x44504664);
 	if (!dst->Buffer) {
 		return 0x0C0000017;
@@ -34,6 +35,7 @@ NTSTATUS avk_GetSimulateUSBValue(PUNICODE_STRING RegistryPath) {
 	OBJECT_ATTRIBUTES ObjectAttributes ={ 0 };
 	KEYVALUEINFORMATION KeyValueInformation ={ 0 };
 
+	PAGED_CODE();
 	InitializeObjectAttributes(&ObjectAttributes , RegistryPath , OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE , 0 , 0);
 	g_Avk_Mutant.field_40 = 0;
 	if (ZwOpenKey(&KeyHandle , 0x20019 , &ObjectAttributes) >= 0) {
@@ -158,15 +160,124 @@ void sub_140002E74(HANDLE ParentId , HANDLE ProcessId , BOOLEAN Create) {
 
 NTSTATUS avk_DispatchCreateClose(_Inout_ struct _DEVICE_OBJECT *DeviceObject , _Inout_ struct _IRP *Irp) {
 	UNREFERENCED_PARAMETER(DeviceObject);
-	UNREFERENCED_PARAMETER(Irp);
-
+	Irp->IoStatus.Status = 0;
+	Irp->IoStatus.Information = 0;
+	IofCompleteRequest(Irp , 0);
 	return 0;
 }
 
 NTSTATUS avk_DispatchDeviceControl(_Inout_ struct _DEVICE_OBJECT *DeviceObject , _Inout_ struct _IRP *Irp) {
 	UNREFERENCED_PARAMETER(DeviceObject);
-	UNREFERENCED_PARAMETER(Irp);
-	return 0;
+
+	NTSTATUS Status = 0;
+	ULONG  flag = 0;
+	Irp->IoStatus.Status = 0;		//	0x30
+	Irp->IoStatus.Information = 0;	//	0x38
+
+	PAGED_CODE();
+	PAM_OFF28 pAm_off28 = sub_1400019E4();
+	if (!pAm_off28) {
+		Status = 0x0C0000002;
+		goto loc_140009354;
+	}
+	if (!Irp->AssociatedIrp.MasterIrp) {
+		Status = 0xC0000206;
+		goto loc_140009354;
+	}
+	//	Irp->Tail.Overlay.CurrentStackLocation->MajorFunction //	0xb8
+	//	Irp->Tail.Overlay.CurrentStackLocation->Parameters.Create.EaLength //	0x18
+	//	Irp->AssociatedIrp.MasterIrp->Type //	p->18->0
+	flag = Irp->Tail.Overlay.CurrentStackLocation->Parameters.Read.ByteOffset.LowPart - 0x22001C;
+	if (!flag) {
+		if (Irp->Tail.Overlay.CurrentStackLocation->Parameters.Create.Options != 4) {
+			Status = 0x0C000000D;
+			goto loc_140009354;
+		}
+		Irp->AssociatedIrp.MasterIrp->Type = pAm_off28->Type;
+		Irp->AssociatedIrp.MasterIrp->Size = pAm_off28->Size;
+		Irp->IoStatus.Information = 4;
+		goto loc_140009354;
+	}
+	flag -= 4;
+	if (!flag) {
+		if (Irp->Tail.Overlay.CurrentStackLocation->Parameters.Create.Options != 4) {
+			Status = 0x0C000000D;
+		}
+		else if (*(int *)&Irp->AssociatedIrp.MasterIrp->Type == 0x47555741) {
+			sub_1400032F8();
+		}
+		goto loc_140009354;
+	}
+	flag -= 0x3FE4;
+	if (!flag) {
+		if (Irp->Tail.Overlay.CurrentStackLocation->Parameters.Create.Options != 0x10) {
+			Status = 0x0C000000D;
+		}
+		else {
+			pAm_off28->field_0 = *(__int64 *)&Irp->AssociatedIrp.MasterIrp->Type;
+		}
+		goto loc_140009354;
+	}
+	flag -= 4;
+	if (!flag) {
+		if (Irp->Tail.Overlay.CurrentStackLocation->Parameters.Create.Options != 0x10) {
+			Status = 0x0C000000D;
+			goto loc_140009354;
+		}
+		if (Irp->AssociatedIrp.MasterIrp->MdlAddress) {
+			Status = sub_140003290(Irp->AssociatedIrp.MasterIrp);
+			if (Status < 0) {
+				goto loc_140009354;
+			}
+		}
+		if (Irp->Tail.Overlay.CurrentStackLocation->Parameters.Read.Length < 0x28 || pAm_off28->field_8) {
+			goto loc_140009354;
+		}
+		memset(Irp->AssociatedIrp.MasterIrp->MdlAddress , 0 , Irp->Tail.Overlay.CurrentStackLocation->Parameters.Read.Length);
+		*(__int32 *)&Irp->AssociatedIrp.MasterIrp->Type = Irp->Tail.Overlay.CurrentStackLocation->Parameters.Read.Length;
+		sub_140002A40(pAm_off28 , Irp);
+		return 0x103;
+	}
+	flag -= 4;
+	if (!flag) {
+		if (Irp->Tail.Overlay.CurrentStackLocation->Parameters.Create.Options != 8) {
+			Status = 0x0C000000D;
+		}
+		else {
+			*(__int64 *)&pAm_off28->field_C[12] = *(__int64 *)&Irp->AssociatedIrp.MasterIrp->Type;
+		}
+		goto loc_140009354;
+	}
+	flag -= 4;
+	if (!flag) {
+		avk_GetSimulateUSBValue(&g_AvkInit.RegistryPath);
+		if (Irp->Tail.Overlay.CurrentStackLocation->Parameters.Create.Options == 4 && Irp->AssociatedIrp.MasterIrp->MdlAddress) {
+			Irp->AssociatedIrp.MasterIrp->Type = pAm_off28->Type;
+			Irp->AssociatedIrp.MasterIrp->Size = pAm_off28->Size;
+			sub_1400032EC();
+			sub_140003150();
+		}
+		goto loc_140009354;
+	}
+	flag -= 4;
+	if (!flag) {
+		if (Irp->Tail.Overlay.CurrentStackLocation->Parameters.Create.Options != 8) {
+			Status = 0x0C000000D;
+		}
+		else if (Irp->AssociatedIrp.MasterIrp->MdlAddress) {
+			Status = sub_140003290(Irp->AssociatedIrp.MasterIrp);
+		}
+		goto loc_140009354;
+	}
+	flag -= 4;
+	if (!flag) {
+		Status = 0x0C00000BB;
+	}
+loc_140009354:
+	Irp->IoStatus.Status = Status;
+	_InterlockedExchange((volatile LONG *)&Irp->CancelRoutine , 0);
+	IofCompleteRequest(Irp , 0);
+	return Status;
 }
 
 int avk_GetOffsetFlag(int dwBuildNumber , int dwMinorVersion) {
@@ -193,7 +304,7 @@ int avk_GetPeprocessValue(char *peprocess , int length , char *aSystem , int Lim
 				break;
 			}
 			else if (j == LimitValue) {
-				return i;	
+				return i;
 			}
 			int x_flag = aSystem[j];
 			int v_flag = peprocess[i + j];
@@ -213,4 +324,31 @@ int avk_GetPeprocessValue(char *peprocess , int length , char *aSystem , int Lim
 	}
 	return 0;
 }
+
+PAM_OFF28 sub_1400019E4() {
+	return g_AvkInit.am_off28;
+}
+
+NTSTATUS sub_140003290(void *a1) {
+	UNREFERENCED_PARAMETER(a1);
+	return 0;
+}
+
+void sub_1400032EC() {
+	g_AvkInit.field_68 = 1;
+}
+
+NTSTATUS sub_140003150() {
+	return 0;
+}
+
+void sub_140002A40(void *a1 , void *a2) {
+	UNREFERENCED_PARAMETER(a1);
+	UNREFERENCED_PARAMETER(a2);
+}
+
+void sub_1400032F8() {
+
+}
+
 
